@@ -14,3 +14,10 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
+Route::resource('clients','ClientController');
+Route::resource('invoices','InvoiceController');
+Route::resource('invoice_lines','InvoiceLineController');

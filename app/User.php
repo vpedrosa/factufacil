@@ -5,6 +5,12 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+/**
+ * Class User
+ * @property string email
+ * @property string password
+ * @package App
+ */
 class User extends Authenticatable
 {
     use Notifiable;
