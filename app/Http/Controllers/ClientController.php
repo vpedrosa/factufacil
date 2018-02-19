@@ -7,6 +7,18 @@ use Illuminate\Http\Request;
 
 class ClientController extends Controller
 {
+
+    protected $provincias;
+
+    public function __construct()
+    {
+        $this->provincias = ['Alava','Albacete','Alicante','Almería','Asturias','Avila','Badajoz','Barcelona','Burgos','Cáceres',
+            'Cádiz','Cantabria','Castellón','Ciudad Real','Córdoba','La Coruña','Cuenca','Gerona','Granada','Guadalajara',
+            'Guipúzcoa','Huelva','Huesca','Islas Baleares','Jaén','León','Lérida','Lugo','Madrid','Málaga','Murcia','Navarra',
+            'Orense','Palencia','Las Palmas','Pontevedra','La Rioja','Salamanca','Segovia','Sevilla','Soria','Tarragona',
+            'Santa Cruz de Tenerife','Teruel','Toledo','Valencia','Valladolid','Vizcaya','Zamora','Zaragoza'];
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -24,7 +36,7 @@ class ClientController extends Controller
      */
     public function create()
     {
-        //
+        return view('clients.create', ['provinces' => $this->provincias]);
     }
 
     /**
@@ -35,7 +47,16 @@ class ClientController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $client = new Client();
+        $client->name = $request->name;
+        $client->nif = $request->nif;
+        $client->address = $request->address;
+        $client->phone = $request->phone;
+        $client->province = $request->province;
+        $client->zip_code = $request->zip_code;
+        $client->save();
+
+        return redirect()->route('home')->with('status', '¡Cliente '.$client->id.' creado con éxito!');
     }
 
     /**

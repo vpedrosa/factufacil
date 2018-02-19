@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * Class User
  * @property string email
  * @property string password
+ * @property string name
  * @package App
  */
 class User extends Authenticatable
