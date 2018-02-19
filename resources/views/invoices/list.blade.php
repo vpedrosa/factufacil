@@ -12,7 +12,7 @@
                         <th>Serie</th>
                         <th>Cliente</th>
                         <th>Importe</th>
-
+                        <th>Acciones</th>
                     </tr>
                     </thead>
                     <tbody>

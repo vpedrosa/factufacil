@@ -4,7 +4,11 @@
     <div class="container">
         <div class="row">
             <div class="col">
-                <h1>Creación de nueva factura para {{ $client->name }}</h1>
+                @if(isset($invoice))
+                    <h1>Edición de factura {{ $invoice->number }}/{{ $invoice->series }}</h1>
+                @else
+                    <h1>Creación de nueva factura para {{ $client->name }}</h1>
+                @endif
 
                 {{ Form::open(['route' => 'invoices.store', 'method' => 'post']) }}
                 {{ csrf_field() }}
@@ -30,44 +34,52 @@
                         </div>
                     </div>
                 </div>
-
-                @if(isset($invoice))
-                    @foreach($invoice->invoice_lines as $invoice_line)
-                    <div class="row">
-                        <div class="col">
-                            <div class="form-group">
-                                {{ Form::label('product_'.$invoice_line->id,  'Producto:') }}
-                                {{ Form::text('product_'.$invoice_line->id, $invoice_line->product, ['class' => 'form-control']) }}
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="form-group">
-                                {{ Form::label('unit_price_'.$invoice_line->id,  'Percio por unidad:') }}
-                                {{ Form::text('unit_price_'.$invoice_line->id, $invoice_line->unit_price, ['class' => 'form-control']) }}
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="form-group">
-                                {{ Form::label('amount_'.$invoice_line->id,  'Unidades:') }}
-                                {{ Form::text('amount_'.$invoice_line->id, $invoice_line->amount, ['class' => 'form-control']) }}
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                    @empty($invoice->invoice_lines)
+                <div class="row">
+                    <div class="col">
+                        @if(isset($invoice))
+                            <h3>Líneas de factura</h3>
+                            <hr>
+                            @foreach($invoice->invoice_lines as $invoice_line)
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            {{ Form::label('product_'.$invoice_line->id,  'Producto:') }}
+                                            {{ Form::text('product_'.$invoice_line->id, $invoice_line->product, ['class' => 'form-control']) }}
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-group">
+                                            {{ Form::label('unit_price_'.$invoice_line->id,  'Percio por unidad:') }}
+                                            {{ Form::text('unit_price_'.$invoice_line->id, $invoice_line->unit_price, ['class' => 'form-control']) }}
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-group">
+                                            {{ Form::label('amount_'.$invoice_line->id,  'Unidades:') }}
+                                            {{ Form::text('amount_'.$invoice_line->id, $invoice_line->amount, ['class' => 'form-control']) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                            @empty($invoice->invoice_lines)
+                                <div class="row">
+                                    <div class="col">
+                                        <p>No hay líneas asignadas. Haz
+                                            clic {{ link_to_route('invoices.add-line',["id" => $invoice->id]) }} para
+                                            añadir líneas.</p>
+                                    </div>
+                                </div>
+                            @endempty
+                        @else
                             <div class="row">
                                 <div class="col">
-                                    <p>No hay líneas asignadas. Haz clic {{ link_to_route('invoices.add-line',["id" => $invoice->id]) }} para añadir líneas.</p>
+                                    <p>Añadirás las líneas posteriormente.</p>
                                 </div>
                             </div>
-                    @endempty
-                @else
-                    <div class="row">
-                        <div class="col">
-                            <p>Añadirás las líneas posteriormente.</p>
-                        </div>
+                        @endif
                     </div>
-                @endif
+                </div>
+
 
                 <div class="row">
                     <div class="col text-right">
