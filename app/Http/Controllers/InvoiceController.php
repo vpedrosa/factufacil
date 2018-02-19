@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Client;
 use App\Invoice;
+use App\InvoiceLine;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
@@ -14,17 +16,19 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-        //
+        $invoices = Invoice::orderBy('id','desc')->paginate(10);
+        return view('invoices.list',compact('invoices'));
     }
 
     /**
      * Show the form for creating a new resource.
      *
+     * @param Client $client
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function createWithClient(Client $client)
     {
-        //
+        return view('invoices.create', compact('client'));
     }
 
     /**
@@ -35,7 +39,20 @@ class InvoiceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        /** @var Client $client */
+        $client = Client::findOrFail($request->client_id);
+        $invoice = new Invoice();
+        $invoice->client()->associate($client);
+        $this->save($invoice, $request);
+        return redirect()->route('home')->with('status', '¡Factura '.$invoice->number.'/'.$invoice->series.' creada con éxito!');
+    }
+
+    private function save(Invoice &$invoice, Request &$request, $save = true)
+    {
+        $invoice->number = $request->number;
+        $invoice->series = $request->series;
+        $invoice->date = $request->date;
+        if($save) $invoice->save();
     }
 
     /**
@@ -46,7 +63,7 @@ class InvoiceController extends Controller
      */
     public function show(Invoice $invoice)
     {
-        //
+        return view('invoices.show', compact('invoice'));
     }
 
     /**
@@ -57,7 +74,7 @@ class InvoiceController extends Controller
      */
     public function edit(Invoice $invoice)
     {
-        //
+        return view('invoices.create', ['invoice' => $invoice, 'client' => $invoice->client]);
     }
 
     /**
@@ -69,7 +86,8 @@ class InvoiceController extends Controller
      */
     public function update(Request $request, Invoice $invoice)
     {
-        //
+        $this->save($invoice,$request);
+        return redirect()->route('home')->with('status', '¡Factura '.$invoice->number.'/'.$invoice->series.' actualizada con éxito!');
     }
 
     /**
@@ -80,6 +98,8 @@ class InvoiceController extends Controller
      */
     public function destroy(Invoice $invoice)
     {
-        //
+        $invoice->delete();
+        return redirect()->route('home')->with('status', '¡Factura eliminada con éxito!');
+
     }
 }

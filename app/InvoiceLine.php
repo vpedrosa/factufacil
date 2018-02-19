@@ -16,6 +16,7 @@ use Carbon\Carbon;
  * @property  integer amount
  * @property  float unit_price
  * @property  Invoice invoice
+ * @property float total
  * @mixin  \Eloquent
  */
 
@@ -27,6 +28,11 @@ class InvoiceLine extends Model {
      */
     public function invoice() {
         return $this->belongsTo('App\Invoice');
+    }
+
+    public function getTotalAttribute()
+    {
+        return $this->unit_price * $this->amount;
     }
 
 }

@@ -7,26 +7,15 @@ use Illuminate\Http\Request;
 
 class ClientController extends Controller
 {
-
-    protected $provincias;
-
-    public function __construct()
-    {
-        $this->provincias = ['Alava','Albacete','Alicante','Almería','Asturias','Avila','Badajoz','Barcelona','Burgos','Cáceres',
-            'Cádiz','Cantabria','Castellón','Ciudad Real','Córdoba','La Coruña','Cuenca','Gerona','Granada','Guadalajara',
-            'Guipúzcoa','Huelva','Huesca','Islas Baleares','Jaén','León','Lérida','Lugo','Madrid','Málaga','Murcia','Navarra',
-            'Orense','Palencia','Las Palmas','Pontevedra','La Rioja','Salamanca','Segovia','Sevilla','Soria','Tarragona',
-            'Santa Cruz de Tenerife','Teruel','Toledo','Valencia','Valladolid','Vizcaya','Zamora','Zaragoza'];
-    }
-
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function index()
     {
-        //
+        $clients = Client::orderBy('id', 'desc')->paginate(10);
+        return view('clients.list',compact('clients'));
     }
 
     /**
@@ -36,7 +25,7 @@ class ClientController extends Controller
      */
     public function create()
     {
-        return view('clients.create', ['provinces' => $this->provincias]);
+        return view('clients.create');
     }
 
     /**
@@ -48,15 +37,26 @@ class ClientController extends Controller
     public function store(Request $request)
     {
         $client = new Client();
+        $this->save($client, $request);
+        return redirect()->route('home')->with('status', '¡Cliente '.$client->id.' creado con éxito!');
+    }
+
+    /**
+     * Stores a client in database
+     *
+     * @param Client $client
+     * @param Request $request
+     * @param bool $save
+     */
+    private function save(Client &$client, Request &$request, $save = true)
+    {
         $client->name = $request->name;
         $client->nif = $request->nif;
         $client->address = $request->address;
         $client->phone = $request->phone;
         $client->province = $request->province;
         $client->zip_code = $request->zip_code;
-        $client->save();
-
-        return redirect()->route('home')->with('status', '¡Cliente '.$client->id.' creado con éxito!');
+        if($save) $client->save();
     }
 
     /**
@@ -67,7 +67,7 @@ class ClientController extends Controller
      */
     public function show(Client $client)
     {
-        //
+        return view('clients.show', compact('client'));
     }
 
     /**
@@ -78,7 +78,7 @@ class ClientController extends Controller
      */
     public function edit(Client $client)
     {
-        //
+        return view('clients.create', compact('client'));
     }
 
     /**
@@ -90,7 +90,8 @@ class ClientController extends Controller
      */
     public function update(Request $request, Client $client)
     {
-        //
+        $this->save($client, $request);
+        return redirect()->route('home')->with('status', '¡Cliente '.$client->id.' actualizado con éxito!');
     }
 
     /**
@@ -101,6 +102,7 @@ class ClientController extends Controller
      */
     public function destroy(Client $client)
     {
-        //
+        $client->delete();
+        return redirect()->route('home')->with('status', '¡Cliente eliminado con éxito!');
     }
 }

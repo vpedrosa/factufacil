@@ -2,84 +2,71 @@
 
 namespace App\Http\Controllers;
 
+use App\Invoice;
 use App\InvoiceLine;
 use Illuminate\Http\Request;
 
 class InvoiceLineController extends Controller
 {
+
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * Vista de creación de línea
+     * @param Invoice $invoice
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function index()
+    public function create(Invoice $invoice)
     {
-        //
+        return view('invoice-lines.create', compact('invoice'));
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * Almacenar una línea
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
-        //
+        /** @var Invoice $invoice */
+        $invoice = Invoice::findOrFail($request->invoice_id);
+        return $this->storeWithInvoice($invoice, $request);
+    }
+    /**
+     * Almacenar una línea con una factura
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeWithInvoice(Invoice $invoice, Request $request)
+    {
+        $invoice_line = new InvoiceLine();
+        $this->save($invoice_line, $request, $invoice);
+
+        return redirect()->route('invoices.show',['invoice' => $invoice->id])->with('session','Línea añadida con éxito');
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  InvoiceLine $invoice_line
-     * @return \Illuminate\Http\Response
+     * Actualizar una línea
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function show(InvoiceLine $invoice_line)
+    public function update(InvoiceLine $invoice_line, Request $request)
     {
-        //
+        $this->save($invoice_line, $request, $invoice_line->invoice);
+        return redirect()->route('invoices.show',['invoice' => $invoice_line->invoice->id])->with('session','Línea editada con éxito');
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  InvoiceLine $invoice_line
-     * @return \Illuminate\Http\Response
+     * Guardar una línea
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function edit(InvoiceLine $invoice_line)
+    public function save(InvoiceLine $invoice_line, Request $request, Invoice $invoice, $save=true)
     {
-        //
-    }
+        $invoice_line->product = $request->product;
+        $invoice_line->unit_price = $request->unit_price;
+        $invoice_line->amount = $request->amount;
+        $invoice_line->product = $request->product;
+        $invoice_line->invoice()->associate($invoice);
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  InvoiceLine $invoice_line
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, InvoiceLine $invoice_line)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  InvoiceLine $invoice_line
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(InvoiceLine $invoice_line)
-    {
-        //
+        if($save) $invoice_line->save();
     }
 }
