@@ -19,6 +19,7 @@
                     <ul class="list-group">
                         <li class="list-group-item">{{ link_to_route('invoices.index','Gestionar facturas') }}</li>
                         <li class="list-group-item">{{ link_to_route('clients.index','Gestionar clientes') }}</li>
+                        <li class="list-group-item">{{ link_to_route('clients.create','Crear nuevo cliente') }}</li>
                     </ul>
 
                 </div>
